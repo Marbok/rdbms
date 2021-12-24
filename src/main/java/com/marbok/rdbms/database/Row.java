@@ -7,10 +7,19 @@ public abstract class Row {
      *
      * @return value form certain column
      */
-    abstract <T> T getValue(Column column, Class<T> clazz);
+    public abstract Object getValue(Column column);
+
+    public abstract Column getColumn(String columnName);
 
     /**
      * @return merge this row and consume row in one
      */
-    abstract Row merge(Row row);
+    public abstract Row merge(Row row);
+
+    /**
+     * precondition: column exists
+     * @param column
+     * @return
+     */
+    public abstract Cell<?> getCell(String column);
 }

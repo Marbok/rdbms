@@ -1,42 +1,23 @@
 package com.marbok.rdbms.database;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.marbok.rdbms.exception.CannotCreateDatabaseDirectory;
-import com.marbok.rdbms.exception.PathNotDirectoryException;
+import com.marbok.rdbms.exception.TableExistException;
 import com.marbok.rdbms.exception.TableNotExistException;
-import com.marbok.rdbms.exception.WriteNotAllowedException;
 
 public abstract class Database {
 
-    protected final File dbDir;
     protected Map<String, Table> tables = new HashMap<>();
 
     /**
-     * preconditions: pathToDbDirectory is directory, application can create or use files in this directory, files in
-     * directory have right format
-     * postconditions: create directory on disk or initialize database
-     */
-    public Database(Path pathToDbDirectory) {
-        dbDir = new File(pathToDbDirectory.toUri());
-        writeAccessValidate(dbDir);
-        if (dbDir.exists()) {
-            fileIsDirectoryValidate(dbDir);
-            initDatabase(dbDir);
-        } else {
-            if (!dbDir.mkdirs()) {
-                throw new CannotCreateDatabaseDirectory("Can't create database directory: " + dbDir.getPath());
-            }
-        }
-    }
-
-    /**
+     * precondition: table doesn't exist
      * postcondition: create table in database
      */
     public void createTable(Table table) {
+        if (tables.containsKey(table.name())) {
+            throw new TableExistException(table.name() + " exists");
+        }
         tables.put(table.name(), table);
         table.create();
     }
@@ -52,22 +33,16 @@ public abstract class Database {
         tables.get(tableName).drop();
     }
 
-    public abstract void alterTable(Table table); // todo - нужно ли это тут??
-
     /**
-     * postcondition: initialize database
+     * precondition: table exists
+     *
+     * @return table with consumed name
      */
-    protected abstract void initDatabase(File dbDir);
-
-    private void fileIsDirectoryValidate(File file) {
-        if (!file.isDirectory()) {
-            throw new PathNotDirectoryException(file.getPath() + " is not directory");
+    public Table getTable(String tableName) {
+        final Table table = tables.get(tableName);
+        if (table == null) {
+            throw new TableNotExistException("Table with name '" + tableName + "' doesn't exist");
         }
-    }
-
-    private void writeAccessValidate(File file) {
-        if (!file.canWrite()) {
-            throw new WriteNotAllowedException("Application can't write in " + file.getPath());
-        }
+        return table;
     }
 }
