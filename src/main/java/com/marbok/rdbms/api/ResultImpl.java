@@ -18,7 +18,7 @@ public class ResultImpl implements Result {
     }
 
     @Override
-    public int getInt(String column) {
+    public Integer getInt(String column) {
         return (Integer) curr.getCell(column).getValue();
     }
 
@@ -28,7 +28,7 @@ public class ResultImpl implements Result {
     }
 
     @Override
-    public double getDouble(String column) {
+    public Double getDouble(String column) {
         return (Double) curr.getCell(column).getValue();
     }
 

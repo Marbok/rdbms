@@ -1,5 +1,7 @@
 package com.marbok.rdbms.api;
 
+import com.marbok.rdbms.database.types.DoubleType;
+
 public interface Result {
 
     /**
@@ -7,7 +9,7 @@ public interface Result {
      *
      * @return value from column
      */
-    int getInt(String column);
+    Integer getInt(String column);
 
     /**
      * precondition: row has column
@@ -21,7 +23,7 @@ public interface Result {
      *
      * @return value from column
      */
-    double getDouble(String column);
+    Double getDouble(String column);
 
     /**
      * precondition: result has next row

@@ -3,7 +3,7 @@ package com.marbok.rdbms.queries;
 import java.util.Arrays;
 import java.util.List;
 
-import com.marbok.rdbms.database.Cell;
+import com.marbok.rdbms.database.cells.Cell;
 import com.marbok.rdbms.database.Database;
 import com.marbok.rdbms.database.inmemory.InMemoryTable;
 import com.marbok.rdbms.database.Row;
@@ -15,7 +15,7 @@ public class Select extends Operation {
 
     private String columnsString;
     private String[] columns;
-    private String table;
+    private String tableName;
     private String conditionString;
     private Condition condition;
 
@@ -25,10 +25,18 @@ public class Select extends Operation {
 
     @Override
     public Table execute(Database database) {
-        final Row[] rows = database.getTable(table)
-                .select(condition, columns);
+        final Table table = database.getTable(tableName);
 
-        return new InMemoryTable(List.of(rows));
+        Row[] rows;
+        if (condition == null) {
+            rows = table.selectAll(columns);
+        } else {
+            rows = table.select(condition, columns);
+        }
+
+        final InMemoryTable tempTable = new InMemoryTable("tempTable", table.getColumns());
+        tempTable.insertRows(List.of(rows));
+        return tempTable;
     }
 
     @Override
@@ -40,7 +48,7 @@ public class Select extends Operation {
                 .filter(s -> !s.isBlank())
                 .toArray(String[]::new);
         final String[] wheres = split[1].split("where", 2);
-        table = wheres[0].trim();
+        tableName = wheres[0].trim();
         if (wheres.length <= 1) {
             return;
         }
@@ -75,7 +83,7 @@ public class Select extends Operation {
     public String toString() {
         return "Select{" +
                 "columns='" + columnsString + '\'' +
-                ", table='" + table + '\'' +
+                ", table='" + tableName + '\'' +
                 ", condition='" + conditionString + '\'' +
                 '}';
     }

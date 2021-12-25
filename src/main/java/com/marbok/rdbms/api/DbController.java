@@ -20,16 +20,20 @@ public class DbController {
             "insert", Insert::new
     );
 
-    private Database database;
+    private final Database database;
+
+    public DbController(Database database) {
+        this.database = database;
+    }
 
     /**
-     * precondition: query is valid
+     * precondition: query is valid.
      *
-     * @return
+     * @return query result
      */
     public Result execute(String query) {
 
-        final String formatQuery = query.trim().toLowerCase();
+        final String formatQuery = query.trim();
 
         final int firstSpace = formatQuery.indexOf(' ');
 
@@ -37,7 +41,7 @@ public class DbController {
             throw new InvalidQueryException(query);
         }
 
-        Function<String, Operation> operationF = operations.get(formatQuery.substring(firstSpace));
+        Function<String, Operation> operationF = operations.get(formatQuery.substring(0, firstSpace));
         if (operationF == null) {
             throw new InvalidQueryException(query);
         }
@@ -45,10 +49,23 @@ public class DbController {
         Table table = operationF.apply(formatQuery)
                 .execute(database);
 
+        if (table == null) {
+            return new NullResult();
+        }
+
         return new ResultImpl(table);
     }
 
-    public void initInMemoryDatabase() {
-        database = new InMemoryDatabase();
+    /**
+     * precondition: query is valid.
+     * postcondition: execute query
+     */
+    public void executeQuery(String query) {
+        execute(query);
+    }
+
+
+    public static DbController memDatabase() {
+        return new DbController(new InMemoryDatabase());
     }
 }
