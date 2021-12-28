@@ -2,7 +2,7 @@ package com.marbok.rdbms.database.cells;
 
 import com.marbok.rdbms.database.types.Type;
 
-public class Cell<T extends Comparable<T>> {
+public abstract class Cell<T extends Comparable<T>> {
 
     private final T value;
     private final Type<T> type;
