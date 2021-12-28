@@ -53,7 +53,7 @@ public class DbController {
             return new NullResult();
         }
 
-        return new ResultImpl(table);
+        return new ResultImpl(table.getRowsIterator());
     }
 
     /**

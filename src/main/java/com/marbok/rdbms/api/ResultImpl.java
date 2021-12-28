@@ -3,18 +3,15 @@ package com.marbok.rdbms.api;
 import java.util.Iterator;
 
 import com.marbok.rdbms.database.Row;
-import com.marbok.rdbms.database.Table;
 
 public class ResultImpl implements Result {
 
-    private final Table table;
     private final Iterator<Row> rowIterator;
 
     private Row curr;
 
-    public ResultImpl(Table table) {
-        this.table = table;
-        rowIterator = table.getRowsIterator();
+    public ResultImpl(Iterator<Row> rowIterator) {
+        this.rowIterator = rowIterator;
     }
 
     @Override
